@@ -1,0 +1,348 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Projects"
+             xmlns:wdto="using:DevTracker.Application.DTOs.WorkItems"
+             xmlns:converters="using:DevTracker.Desktop.Converters"
+             x:Class="DevTracker.Desktop.Views.Projects.ProjectDetailView"
+             x:DataType="vm:ProjectDetailViewModel"
+             Background="#111318">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Cabecalho -->
+        <Border Grid.Row="0" Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="0,0,0,1"
+                Padding="24,16">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Botao voltar -->
+                <Button Grid.Column="0" Content="← Back"
+                        Command="{Binding GoBackCommand}"
+                        Background="Transparent" Foreground="#6B7280"
+                        BorderThickness="0" Padding="0,0,16,0"
+                        FontSize="13" />
+
+                <!-- Titulo do projeto -->
+                <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock Text="{Binding Project.Name, FallbackValue='—'}"
+                               FontSize="22" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                    <TextBlock Text="{Binding Project.State, FallbackValue=''}"
+                               FontSize="12" Foreground="#6366F1" />
+                </StackPanel>
+
+                <!-- Acoes -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <!-- AI Name -->
+                    <StackPanel Orientation="Horizontal" Spacing="6"
+                                IsVisible="{Binding CanUpdate}">
+                        <TextBox Text="{Binding Project.UsedAiName, Mode=TwoWay}"
+                                 PlaceholderText="AI Used (e.g. Kimi)"
+                                 Background="#181B22" Foreground="#F5F6F8"
+                                 BorderBrush="#2D3142" BorderThickness="1"
+                                 CornerRadius="6" Padding="8,5"
+                                 FontSize="12" Width="140"
+                                 VerticalAlignment="Center" />
+                        <Button Content="Save"
+                                Command="{Binding SaveAiNameCommand}"
+                                Background="Transparent" Foreground="#2563EB"
+                                BorderThickness="0" Padding="4"
+                                FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <Button Content="↺"
+                            Command="{Binding ReloadCommand}"
+                            ToolTip.Tip="Refresh"
+                            Background="Transparent" Foreground="#6B7280"
+                            BorderThickness="0" Padding="4"
+                            FontSize="14" />
+
+                    <!-- Alterar Estado -->
+                    <Button Command="{Binding ChangeStateCommand}"
+                            IsVisible="{Binding CanChangeState}"
+                            Background="#2D3142" Foreground="#F5F6F8"
+                            BorderBrush="#3E4252" BorderThickness="1"
+                            CornerRadius="8" Padding="12,6"
+                            FontSize="13" FontWeight="Medium"
+                            Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="State:" FontSize="12" Foreground="#A0A4B0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Project.State}" FontSize="13" Foreground="#F5F6F8" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Conteudo com TabControl -->
+        <TabControl Grid.Row="1" Background="Transparent">
+            <TabItem Header="Kanban Board">
+                <Grid ColumnDefinitions="*,1,320">
+                    <!-- Kanban: 3 colunas -->
+                    <ScrollViewer Grid.Column="0" Padding="24">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="Work Items" FontSize="16" FontWeight="Medium" Foreground="#F5F6F8" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="+ Work Item"
+                                        Command="{Binding CreateWorkItemCommand}"
+                                        IsVisible="{Binding CanCreateWorkItem}"
+                                        Background="#2563EB" Foreground="#FFFFFF"
+                                        CornerRadius="6" Padding="12,6" FontSize="12" FontWeight="Medium" />
+                            </Grid>
+                            <!-- Filtros -->
+                            <Grid ColumnDefinitions="*,12,200" Margin="0,0,0,8">
+                                <TextBox Grid.Column="0"
+                                         PlaceholderText="Search tasks..."
+                                         Text="{Binding SearchQuery, Mode=TwoWay}"
+                                         Background="#181B22" Foreground="#D0D3DD"
+                                         BorderBrush="#2D3142" BorderThickness="1"
+                                         CornerRadius="6" Padding="10,7"
+                                         FontSize="13" />
+                                <ComboBox Grid.Column="2"
+                                          ItemsSource="{Binding AvailableTypes}"
+                                          SelectedItem="{Binding SelectedTypeFilter, Mode=TwoWay}"
+                                          Background="#181B22" Foreground="#D0D3DD"
+                                          BorderBrush="#2D3142" BorderThickness="1"
+                                          CornerRadius="6" Padding="8,5"
+                                          FontSize="13"
+                                          HorizontalAlignment="Stretch"
+                                          DisplayMemberBinding="{Binding ., Converter={x:Static converters:WorkItemTypeFilterConverter.Instance}}" />
+                            </Grid>
+
+                            <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                                         Foreground="#2563EB" Height="2" Margin="0,0,0,8" />
+                            <TextBlock Text="{Binding BusyMessage}"
+                                       IsVisible="{Binding IsBusy}"
+                                       FontSize="12" Foreground="#AEB3C2"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,4,0,0" />
+                            <Grid ColumnDefinitions="*,12,*,12,*">
+                                <!-- Active -->
+                                <StackPanel Grid.Column="0" Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                        <TextBlock Grid.Column="0" Text="Active" FontSize="14" FontWeight="Medium" Foreground="#6366F1" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding ActiveItems.Count}" FontSize="12" Foreground="#6B7280" />
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding ActiveItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="wdto:WorkItemSummaryDto">
+                                                <Button Background="Transparent" Padding="0" Margin="0,0,0,6"
+                                                        Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).OpenWorkItemCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                                        BorderThickness="0">
+                                                    <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                                                            CornerRadius="6" Padding="12,8">
+                                                        <StackPanel Spacing="4">
+                                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                <TextBlock FontSize="10" Foreground="#6B7280">#<Run Text="{Binding Number}" /></TextBlock>
+                                                                <TextBlock Text="{Binding Title}" FontSize="13" Foreground="#F5F6F8" TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <TextBlock Text="{Binding Type}" FontSize="10" Foreground="#6B7280" />
+                                                                <TextBlock Text="{Binding Priority}" FontSize="10" Foreground="#D97706" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,0,0">
+                                                                <Button Content="→ Todo" Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).MoveToTodoCommand}"
+                                                                        CommandParameter="{Binding}" Background="#1E222D" Foreground="#A0A4B0"
+                                                                        BorderBrush="#2D3142" BorderThickness="1" CornerRadius="4" Padding="6,2" FontSize="10" />
+                                                                <Button Content="→ Done" Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).MoveToDoneCommand}"
+                                                                        CommandParameter="{Binding}" Background="#1E222D" Foreground="#A0A4B0"
+                                                                        BorderBrush="#2D3142" BorderThickness="1" CornerRadius="4" Padding="6,2" FontSize="10" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <!-- Todo -->
+                                <StackPanel Grid.Column="2" Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                        <TextBlock Grid.Column="0" Text="Todo" FontSize="14" FontWeight="Medium" Foreground="#A0A4B0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding TodoItems.Count}" FontSize="12" Foreground="#6B7280" />
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding TodoItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="wdto:WorkItemSummaryDto">
+                                                <Button Background="Transparent" Padding="0" Margin="0,0,0,6"
+                                                        Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).OpenWorkItemCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                                        BorderThickness="0">
+                                                    <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                                                            CornerRadius="6" Padding="12,8">
+                                                        <StackPanel Spacing="4">
+                                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                <TextBlock FontSize="10" Foreground="#6B7280">#<Run Text="{Binding Number}" /></TextBlock>
+                                                                <TextBlock Text="{Binding Title}" FontSize="13" Foreground="#F5F6F8" TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <TextBlock Text="{Binding Type}" FontSize="10" Foreground="#6B7280" />
+                                                                <TextBlock Text="{Binding Priority}" FontSize="10" Foreground="#D97706" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,0,0">
+                                                                <Button Content="→ Active" Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).MoveToActiveCommand}"
+                                                                        CommandParameter="{Binding}" Background="#1E222D" Foreground="#A0A4B0"
+                                                                        BorderBrush="#2D3142" BorderThickness="1" CornerRadius="4" Padding="6,2" FontSize="10" />
+                                                                <Button Content="→ Done" Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).MoveToDoneCommand}"
+                                                                        CommandParameter="{Binding}" Background="#1E222D" Foreground="#A0A4B0"
+                                                                        BorderBrush="#2D3142" BorderThickness="1" CornerRadius="4" Padding="6,2" FontSize="10" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <!-- Done -->
+                                <StackPanel Grid.Column="4" Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                                        <TextBlock Grid.Column="0" Text="Done" FontSize="14" FontWeight="Medium" Foreground="#16A34A" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding DoneItems.Count}" FontSize="12" Foreground="#6B7280" />
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding DoneItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="wdto:WorkItemSummaryDto">
+                                                <Button Background="Transparent" Padding="0" Margin="0,0,0,6"
+                                                        Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).OpenWorkItemCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                                        BorderThickness="0">
+                                                    <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                                                            CornerRadius="6" Padding="12,8">
+                                                        <StackPanel Spacing="4">
+                                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                <TextBlock FontSize="10" Foreground="#6B7280">#<Run Text="{Binding Number}" /></TextBlock>
+                                                                <TextBlock Text="{Binding Title}" FontSize="13" Foreground="#F5F6F8" TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <TextBlock Text="{Binding Type}" FontSize="10" Foreground="#6B7280" />
+                                                                <TextBlock Text="{Binding Priority}" FontSize="10" Foreground="#D97706" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,0,0">
+                                                                <Button Content="→ Active" Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).MoveToActiveCommand}"
+                                                                        CommandParameter="{Binding}" Background="#1E222D" Foreground="#A0A4B0"
+                                                                        BorderBrush="#2D3142" BorderThickness="1" CornerRadius="4" Padding="6,2" FontSize="10" />
+                                                                <Button Content="→ Todo" Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).MoveToTodoCommand}"
+                                                                        CommandParameter="{Binding}" Background="#1E222D" Foreground="#A0A4B0"
+                                                                        BorderBrush="#2D3142" BorderThickness="1" CornerRadius="4" Padding="6,2" FontSize="10" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Separador vertical -->
+                    <Border Grid.Column="1" Background="#2D3142" />
+
+                    <!-- Files do disco -->
+                    <DockPanel Grid.Column="2" Background="#181B22">
+                        <Border DockPanel.Dock="Top" BorderBrush="#2D3142" BorderThickness="0,0,0,1" Padding="16,12">
+                            <TextBlock Text="Files" FontSize="14" FontWeight="Medium" Foreground="#F5F6F8" />
+                        </Border>
+                        <ScrollViewer Padding="8,8">
+                            <ItemsControl ItemsSource="{Binding Files}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:FileEntryViewModel">
+                                        <Border Padding="8,6" CornerRadius="4" Margin="0,1">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Icon}" FontSize="13" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Name}" FontSize="12" Foreground="#D0D3DD"
+                                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Prompt Diary">
+                <Grid RowDefinitions="Auto,*">
+                    <!-- Metricas -->
+                    <Border Grid.Row="0" Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                            CornerRadius="8" Padding="16" Margin="24,16,24,0">
+                        <StackPanel Orientation="Horizontal" Spacing="24">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Estimated Prompts (Total)" FontSize="12" Foreground="#A0A4B0" />
+                                <TextBlock Text="{Binding TotalEstimatedPrompts}" FontSize="24" FontWeight="SemiBold" Foreground="#0284C7" />
+                            </StackPanel>
+                            <Border Background="#2D3142" Width="1" />
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Actual Prompts Used (Total)" FontSize="12" Foreground="#A0A4B0" />
+                                <TextBlock Text="{Binding TotalActualPrompts}" FontSize="24" FontWeight="SemiBold" Foreground="#16A34A" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Lista de Done Items com Prompts -->
+                    <ScrollViewer Grid.Row="1" Padding="24">
+                        <StackPanel Spacing="12">
+                            <ItemsControl ItemsSource="{Binding DoneItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="wdto:WorkItemSummaryDto">
+                                        <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                                                CornerRadius="8" Padding="4,0">
+                                            <Expander Background="Transparent" Padding="12,4">
+                                                <Expander.Header>
+                                                    <Grid ColumnDefinitions="60,*,140" Width="640">
+                                                        <TextBlock Grid.Column="0" Text="{Binding Number, StringFormat='#{0}'}"
+                                                                   FontSize="14" FontWeight="SemiBold" Foreground="#6366F1" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Title}"
+                                                                   FontSize="14" Foreground="#F5F6F8" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                        <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                                                            <TextBlock Text="Est. / Real" FontSize="10" Foreground="#6B7280" />
+                                                            <TextBlock FontSize="12" Foreground="#D0D3DD">
+                                                                <Run Text="{Binding EstimatedPrompts}" /> / <Run Text="{Binding ActualPrompts}" />
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Expander.Header>
+
+                                                <StackPanel Spacing="12" Margin="0,8,0,8">
+                                                    <!-- Descricao -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="Description" FontSize="11" FontWeight="Medium" Foreground="#A0A4B0" />
+                                                        <TextBlock Text="{Binding Description, FallbackValue='—'}"
+                                                                   FontSize="13" Foreground="#D1D5DB" TextWrapping="Wrap" />
+                                                    </StackPanel>
+
+                                                    <!-- Prompt Usado -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="Prompt Used" FontSize="11" FontWeight="Medium" Foreground="#A0A4B0" />
+                                                        <Border Background="#1E293B" CornerRadius="6" Padding="12">
+                                                            <TextBlock Text="{Binding AiPromptUsed, FallbackValue='(No prompt recorded)'}"
+                                                                       FontFamily="JetBrains Mono, Cascadia Code, Consolas, monospace"
+                                                                       FontSize="12" Foreground="#E2E8F0" TextWrapping="Wrap" />
+                                                        </Border>
+                                                    </StackPanel>
+
+                                                    <Button Content="Open task →"
+                                                            Command="{Binding $parent[ItemsControl].((vm:ProjectDetailViewModel)DataContext).OpenWorkItemCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Background="Transparent" Foreground="#2563EB"
+                                                            BorderThickness="0" Padding="0" FontSize="12"
+                                                            HorizontalAlignment="Left" />
+                                                </StackPanel>
+                                            </Expander>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

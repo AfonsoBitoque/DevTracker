@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Projects"
+             xmlns:enums="using:DevTracker.Core.Enums"
+             x:Class="DevTracker.Desktop.Views.Projects.ChangeProjectStateDialogView"
+             x:DataType="vm:ChangeProjectStateDialogViewModel">
+
+    <StackPanel Margin="24" Spacing="20">
+        <TextBlock Text="Change Project State" FontSize="18" FontWeight="SemiBold" Foreground="#F5F6F8" />
+
+        <Border Background="#3B1515" CornerRadius="6" Padding="12,8"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" TextWrapping="Wrap" />
+        </Border>
+
+        <!-- Novo Estado -->
+        <StackPanel Spacing="6">
+            <TextBlock Text="New State" FontSize="13" Foreground="#A0A4B0" />
+            <ComboBox SelectedItem="{Binding NewState}"
+                      Background="#111318" Foreground="#F5F6F8"
+                      BorderBrush="#2D3142" CornerRadius="6"
+                      HorizontalAlignment="Stretch" Padding="10,8">
+                <ComboBox.Items>
+                    <enums:ProjectState>NotStarted</enums:ProjectState>
+                    <enums:ProjectState>InProgress</enums:ProjectState>
+                    <enums:ProjectState>Paused</enums:ProjectState>
+                    <enums:ProjectState>Cancelled</enums:ProjectState>
+                    <enums:ProjectState>Completed</enums:ProjectState>
+                </ComboBox.Items>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Razão (obrigatória para Paused/Cancelled) -->
+        <StackPanel Spacing="6" IsVisible="{Binding RequiresReason}">
+            <TextBlock FontSize="13" Foreground="#D97706">
+                <Run Text="Reason required for " />
+                <Run Text="{Binding NewState}" />
+            </TextBlock>
+            <TextBox Text="{Binding Reason}" PlaceholderText="Reason for pause or cancellation..."
+                     Background="#111318" Foreground="#F5F6F8"
+                     BorderBrush="#D97706" CornerRadius="6" Padding="10,8" />
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,12,*">
+            <Button Grid.Column="0" Content="Cancel"
+                    Command="{Binding CancelDialogCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#1E222D" Foreground="#A0A4B0"
+                    BorderBrush="#2D3142" BorderThickness="1"
+                    CornerRadius="6" Padding="0,9" />
+
+            <Button Grid.Column="2" Content="Confirm"
+                    Command="{Binding ConfirmCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#2563EB" Foreground="#FFFFFF"
+                    CornerRadius="6" Padding="0,9" IsEnabled="{Binding !IsBusy}" />
+        </Grid>
+
+        <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                     Foreground="#2563EB" Height="2" />
+    </StackPanel>
+</UserControl>

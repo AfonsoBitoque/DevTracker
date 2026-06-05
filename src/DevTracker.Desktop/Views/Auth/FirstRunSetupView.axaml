@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Auth"
+             x:Class="DevTracker.Desktop.Views.Auth.FirstRunSetupView"
+             x:DataType="vm:FirstRunSetupViewModel"
+             Background="#111318">
+
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-120,0,0,0">
+        <Border Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="1"
+                CornerRadius="8" Padding="40,36" Width="420">
+
+            <StackPanel Spacing="20">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Initial Setup" FontSize="24" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                    <TextBlock FontSize="13" Foreground="#6B7280" TextWrapping="Wrap">
+                        <TextBlock.Text>
+                            <!-- Mensagem contextual consoante o passo -->
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Erro -->
+                <Border Background="#3B1515" CornerRadius="6" Padding="12,8"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" TextWrapping="Wrap" />
+                </Border>
+
+                <!-- Passo 1: Workspace -->
+                <StackPanel IsVisible="{Binding IsWorkspaceStep}" Spacing="16">
+                    <TextBlock Text="Choose the workspace root folder where projects will be stored."
+                               FontSize="13" Foreground="#A0A4B0" TextWrapping="Wrap" />
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Workspace Path" FontSize="13" Foreground="#A0A4B0" />
+                        <TextBox Text="{Binding WorkspacePath}" PlaceholderText="/home/utilizador/workspace"
+                                 Background="#111318" Foreground="#F5F6F8"
+                                 BorderBrush="#2D3142" CornerRadius="6" Padding="10,8"
+                                 FontFamily="JetBrains Mono,Fira Code,Cascadia Code,monospace" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Passo 2: Primeiro Owner -->
+                <StackPanel IsVisible="{Binding !IsWorkspaceStep}" Spacing="16">
+                    <TextBlock Text="Create the first administrator (Owner) account."
+                               FontSize="13" Foreground="#A0A4B0" TextWrapping="Wrap" />
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Username" FontSize="13" Foreground="#A0A4B0" />
+                        <TextBox Text="{Binding Username}" PlaceholderText="admin"
+                                 Background="#111318" Foreground="#F5F6F8"
+                                 BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+                    </StackPanel>
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Password" FontSize="13" Foreground="#A0A4B0" />
+                        <TextBox Text="{Binding Password}" PasswordChar="●"
+                                 Background="#111318" Foreground="#F5F6F8"
+                                 BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+                    </StackPanel>
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Confirm Password" FontSize="13" Foreground="#A0A4B0" />
+                        <TextBox Text="{Binding ConfirmPassword}" PasswordChar="●"
+                                 Background="#111318" Foreground="#F5F6F8"
+                                 BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Content="Continue"
+                        Command="{Binding SetupCommand}"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Background="#2563EB" Foreground="#FFFFFF"
+                        CornerRadius="6" Padding="0,10"
+                        FontSize="14" FontWeight="Medium"
+                        IsEnabled="{Binding !IsBusy}" />
+
+                <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                             Foreground="#2563EB" Height="2" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.WorkItems"
+             xmlns:converters="using:DevTracker.Desktop.Converters"
+             x:Class="DevTracker.Desktop.Views.WorkItems.DiffView"
+             x:DataType="vm:DiffViewModel"
+             MinWidth="900" MinHeight="600">
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <!-- Cabecalho -->
+        <StackPanel Grid.Row="0" Spacing="6" Margin="20,16,20,12">
+            <TextBlock Text="Change Comparison" FontSize="18" FontWeight="SemiBold" Foreground="#F5F6F8" />
+            <TextBlock Text="{Binding WorkItemTitle}" FontSize="14" Foreground="#A0A4B0" />
+            <TextBlock Text="{Binding WorkItemDescription}" FontSize="12" Foreground="#6B7280" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <!-- Comparacao estilo Meld -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" Margin="20,0">
+            <!-- Antes -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,*">
+                <Border Grid.Row="0" Background="#181B22" BorderBrush="#2D3142" BorderThickness="0,0,0,1" Padding="8,4">
+                    <TextBlock Text="Before" FontSize="11" FontWeight="SemiBold" Foreground="#A0A4B0" HorizontalAlignment="Center" />
+                </Border>
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                              Background="#0D1117">
+                    <ItemsControl ItemsSource="{Binding LeftLines}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DiffLine">
+                                <Border Background="{Binding Type, Converter={x:Static converters:DiffLineBrushConverter.Instance}, ConverterParameter=bg}"
+                                        Padding="6,1" MinHeight="18">
+                                    <TextBlock Text="{Binding Text}"
+                                               Foreground="{Binding Type, Converter={x:Static converters:DiffLineBrushConverter.Instance}, ConverterParameter=fg}"
+                                               FontFamily="JetBrains Mono, Cascadia Code, Consolas, monospace"
+                                               FontSize="12"
+                                               TextWrapping="NoWrap" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Separador -->
+            <Border Grid.Column="1" Background="#2D3142" Width="1" />
+
+            <!-- Depois -->
+            <Grid Grid.Column="2" RowDefinitions="Auto,*">
+                <Border Grid.Row="0" Background="#181B22" BorderBrush="#2D3142" BorderThickness="0,0,0,1" Padding="8,4">
+                    <TextBlock Text="After" FontSize="11" FontWeight="SemiBold" Foreground="#A0A4B0" HorizontalAlignment="Center" />
+                </Border>
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                              Background="#0D1117">
+                    <ItemsControl ItemsSource="{Binding RightLines}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DiffLine">
+                                <Border Background="{Binding Type, Converter={x:Static converters:DiffLineBrushConverter.Instance}, ConverterParameter=bg}"
+                                        Padding="6,1" MinHeight="18">
+                                    <TextBlock Text="{Binding Text}"
+                                               Foreground="{Binding Type, Converter={x:Static converters:DiffLineBrushConverter.Instance}, ConverterParameter=fg}"
+                                               FontFamily="JetBrains Mono, Cascadia Code, Consolas, monospace"
+                                               FontSize="12"
+                                               TextWrapping="NoWrap" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- Prompt IA + Actual Prompts -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,12,200" Margin="20,12,20,0">
+            <StackPanel Grid.Column="0" Spacing="6">
+                <TextBlock Text="AI Prompt (optional)" FontSize="12" Foreground="#A0A4B0" />
+                <TextBox Text="{Binding AiPrompt, Mode=TwoWay}"
+                         PlaceholderText="What key prompt did you use with the AI to solve this task? (Optional)"
+                         AcceptsReturn="True"
+                         Height="80"
+                         Background="#181B22" Foreground="#F5F6F8"
+                         BorderBrush="#2D3142" BorderThickness="1"
+                         CornerRadius="6" Padding="10,8"
+                         FontSize="13" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Top">
+                <TextBlock Text="Prompts Needed:" FontSize="12" Foreground="#A0A4B0" />
+                <TextBox Text="{Binding ActualPrompts, Mode=TwoWay}"
+                         PlaceholderText="0"
+                         Background="#181B22" Foreground="#F5F6F8"
+                         BorderBrush="#2D3142" BorderThickness="1"
+                         CornerRadius="6" Padding="10,8"
+                         FontSize="13" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Botoes -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,12,*" Margin="20,16,20,16">
+            <Button Grid.Column="0" Content="Cancel"
+                    Command="{Binding CancelCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#1E222D" Foreground="#A0A4B0"
+                    BorderBrush="#2D3142" BorderThickness="1"
+                    CornerRadius="6" Padding="0,9" />
+
+            <Button Grid.Column="2" Content="Confirm and Commit"
+                    Command="{Binding ConfirmCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#16A34A" Foreground="#FFFFFF"
+                    CornerRadius="6" Padding="0,9" />
+        </Grid>
+    </Grid>
+</UserControl>

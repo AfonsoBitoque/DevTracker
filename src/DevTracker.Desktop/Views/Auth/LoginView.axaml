@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Auth"
+             x:Class="DevTracker.Desktop.Views.Auth.LoginView"
+             x:DataType="vm:LoginViewModel"
+             Background="#111318">
+
+    <!-- Centrado vertical e horizontalmente -->
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-120,0,0,0">
+        <Border Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="1"
+                CornerRadius="8"
+                Padding="40,36"
+                Width="360">
+
+            <StackPanel Spacing="20">
+                <!-- Title -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="DevTracker" FontSize="24" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                    <TextBlock Text="Sign in to continue." FontSize="13" Foreground="#6B7280" />
+                </StackPanel>
+
+                <!-- Mensagem de erro -->
+                <Border Background="#3B1515" CornerRadius="6" Padding="12,8"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" TextWrapping="Wrap" />
+                </Border>
+
+                <!-- Username -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Username" FontSize="13" Foreground="#A0A4B0" />
+                    <TextBox Text="{Binding Username}" PlaceholderText="username"
+                             Background="#111318" Foreground="#F5F6F8"
+                             BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+                </StackPanel>
+
+                <!-- Password -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Password" FontSize="13" Foreground="#A0A4B0" />
+                    <TextBox Text="{Binding Password}" PasswordChar="●" PlaceholderText="••••••••••••"
+                             Background="#111318" Foreground="#F5F6F8"
+                             BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+                </StackPanel>
+
+                <!-- Botão de login -->
+                <Button Content="Login"
+                        Command="{Binding LoginCommand}"
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        Background="#2563EB" Foreground="#FFFFFF"
+                        CornerRadius="6" Padding="0,10"
+                        FontSize="14" FontWeight="Medium"
+                        IsEnabled="{Binding !IsBusy}" />
+
+                <!-- Estado de carregamento -->
+                <ProgressBar IsVisible="{Binding IsBusy}"
+                             IsIndeterminate="True"
+                             Foreground="#2563EB" Height="2" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

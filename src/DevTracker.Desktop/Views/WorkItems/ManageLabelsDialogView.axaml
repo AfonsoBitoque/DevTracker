@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.WorkItems"
+             x:Class="DevTracker.Desktop.Views.WorkItems.ManageLabelsDialogView"
+             x:DataType="vm:ManageLabelsDialogViewModel"
+             Width="400" Height="520">
+
+    <StackPanel Margin="24" Spacing="16">
+        <TextBlock Text="Manage Labels" FontSize="18" FontWeight="SemiBold" Foreground="#F5F6F8" />
+
+        <!-- Add nova etiqueta -->
+        <Grid ColumnDefinitions="*,8,Auto">
+            <TextBox Grid.Column="0"
+                     Text="{Binding NewLabelName, Mode=TwoWay}"
+                     PlaceholderText="New label..."
+                     Background="#181B22" Foreground="#F5F6F8"
+                     BorderBrush="#2D3142" BorderThickness="1"
+                     CornerRadius="6" Padding="10,7"
+                     FontSize="13" />
+            <Button Grid.Column="2" Content="+ Add"
+                    Command="{Binding AddNewLabelCommand}"
+                    Background="#2563EB" Foreground="#FFFFFF"
+                    CornerRadius="6" Padding="12,7" FontSize="12" />
+        </Grid>
+
+        <!-- Lista de etiquetas -->
+        <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                CornerRadius="8" Padding="8" MaxHeight="280">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Labels}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:LabelSelectionItem">
+                            <CheckBox Content="{Binding Name}"
+                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Foreground="#D0D3DD"
+                                      FontSize="13"
+                                      Margin="0,4" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Actions -->
+        <Grid ColumnDefinitions="*,8,*">
+            <Button Grid.Column="0" Content="Cancel"
+                    Command="{Binding CancelDialogCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#1E222D" Foreground="#A0A4B0"
+                    BorderBrush="#2D3142" BorderThickness="1"
+                    CornerRadius="6" Padding="0,9" />
+
+            <Button Grid.Column="2" Content="Save"
+                    Command="{Binding ConfirmDialogCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#2563EB" Foreground="#FFFFFF"
+                    CornerRadius="6" Padding="0,9" />
+        </Grid>
+    </StackPanel>
+</UserControl>

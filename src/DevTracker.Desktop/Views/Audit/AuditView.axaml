@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Audit"
+             xmlns:dto="using:DevTracker.Application.DTOs.Audit"
+             x:Class="DevTracker.Desktop.Views.Audit.AuditView"
+             x:DataType="vm:AuditViewModel"
+             Background="#111318">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Cabeçalho -->
+        <Border Grid.Row="0" Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="0,0,0,1" Padding="24,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Text="Audit" FontSize="24" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                    <TextBlock Text="Last 100 recorded actions" FontSize="13" Foreground="#6B7280" />
+                </StackPanel>
+                <Button Grid.Column="1" Content="↺ Refresh"
+                        Command="{Binding RefreshCommand}"
+                        Background="Transparent" Foreground="#6B7280"
+                        BorderBrush="#2D3142" BorderThickness="1"
+                        CornerRadius="6" Padding="12,7" FontSize="13" />
+            </Grid>
+        </Border>
+
+        <!-- Feedback -->
+        <StackPanel Grid.Row="1" Margin="24,12" Spacing="8">
+            <Border Background="#3B1515" CornerRadius="6" Padding="12,8"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" />
+            </Border>
+            <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                         Foreground="#2563EB" Height="2" />
+        </StackPanel>
+
+        <!-- Tabela de audit -->
+        <ScrollViewer Grid.Row="2" Padding="24,0,24,24">
+            <ItemsControl ItemsSource="{Binding Entries}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="dto:AuditEntryDto">
+                        <Border BorderBrush="#2D3142" BorderThickness="0,0,0,1" Padding="4,10">
+                            <Grid ColumnDefinitions="160,120,*,140">
+                                <!-- Timestamp -->
+                                <TextBlock Grid.Column="0" FontSize="12"
+                                           Foreground="#6B7280"
+                                           FontFamily="JetBrains Mono,Fira Code,monospace"
+                                           Text="{Binding Timestamp, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"
+                                           VerticalAlignment="Center" />
+                                <!-- Username -->
+                                <TextBlock Grid.Column="1" FontSize="12" Foreground="#A0A4B0"
+                                           Text="{Binding Username, FallbackValue='—'}"
+                                           VerticalAlignment="Center" />
+                                <!-- Acção -->
+                                <TextBlock Grid.Column="2" FontSize="12" Foreground="#F5F6F8"
+                                           Text="{Binding Action}"
+                                           VerticalAlignment="Center" />
+                                <!-- Entity -->
+                                <TextBlock Grid.Column="3" FontSize="11" Foreground="#6366F1"
+                                           Text="{Binding EntityType}"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

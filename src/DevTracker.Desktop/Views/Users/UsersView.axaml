@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Users"
+             xmlns:dto="using:DevTracker.Application.DTOs.Users"
+             x:Class="DevTracker.Desktop.Views.Users.UsersView"
+             x:DataType="vm:UsersViewModel"
+             Background="#111318">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Cabeçalho -->
+        <Border Grid.Row="0" Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="0,0,0,1" Padding="24,16">
+            <Grid ColumnDefinitions="*,Auto,12,Auto">
+                <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Text="Users" FontSize="24" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                    <TextBlock Text="Account management" FontSize="13" Foreground="#6B7280" />
+                </StackPanel>
+                <Button Grid.Column="1" Content="↺ Refresh"
+                        Command="{Binding RefreshCommand}"
+                        Background="Transparent" Foreground="#6B7280"
+                        BorderBrush="#2D3142" BorderThickness="1"
+                        CornerRadius="6" Padding="12,7" FontSize="13" />
+                <Button Grid.Column="3" Content="+ New User"
+                        Command="{Binding CreateUserCommand}"
+                        IsVisible="{Binding CanCreate}"
+                        Background="#2563EB" Foreground="#FFFFFF"
+                        CornerRadius="6" Padding="14,8" FontSize="13" FontWeight="Medium" />
+            </Grid>
+        </Border>
+
+        <!-- Feedback -->
+        <StackPanel Grid.Row="1" Margin="24,12" Spacing="8">
+            <Border Background="#3B1515" CornerRadius="6" Padding="12,8"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" />
+            </Border>
+            <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                         Foreground="#2563EB" Height="2" />
+        </StackPanel>
+
+        <!-- Lista -->
+        <ScrollViewer Grid.Row="2" Padding="24,0,24,24">
+            <ItemsControl ItemsSource="{Binding Users}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="dto:UserSummaryDto">
+                        <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                                CornerRadius="8" Padding="16,12" Margin="0,0,0,8">
+                            <Grid ColumnDefinitions="*,Auto,12,Auto">
+                                <StackPanel Grid.Column="0" Spacing="3">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="{Binding Username}" FontSize="14" FontWeight="Medium" Foreground="#F5F6F8" />
+                                        <Border Background="#1E2A4A" CornerRadius="4" Padding="6,2">
+                                            <TextBlock Text="{Binding Role}" FontSize="11" Foreground="#6366F1" />
+                                        </Border>
+                                        <Border Background="#1A2E1A" CornerRadius="4" Padding="6,2"
+                                                IsVisible="{Binding !IsActive}">
+                                            <TextBlock Text="Inactive" FontSize="11" Foreground="#DC2626" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock FontSize="11" Foreground="#6B7280">
+                                        <Run Text="Last login: " />
+                                        <Run Text="{Binding LastLoginAt, FallbackValue='Never'}" />
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <Button Grid.Column="3" Content="Deactivate"
+                                        Command="{Binding $parent[ItemsControl].((vm:UsersViewModel)DataContext).DeactivateUserCommand}"
+                                        CommandParameter="{Binding}"
+                                        IsVisible="{Binding IsActive}"
+                                        Background="Transparent" Foreground="#DC2626"
+                                        BorderBrush="#DC2626" BorderThickness="1"
+                                        CornerRadius="6" Padding="10,5" FontSize="12" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

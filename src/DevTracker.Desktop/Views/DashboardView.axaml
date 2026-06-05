@@ -1,0 +1,297 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels"
+             x:Class="DevTracker.Desktop.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="24"
+                    IsVisible="{Binding Metrics, Converter={x:Static ObjectConverters.IsNotNull}}">
+
+            <!-- Cabecalho -->
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="Productivity Dashboard"
+                           FontSize="24" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                <Button Grid.Column="1" Content="↺ Refresh"
+                        Command="{Binding LoadCommand}"
+                        Background="Transparent" Foreground="#6B7280"
+                        BorderBrush="#2D3142" BorderThickness="1"
+                        CornerRadius="6" Padding="12,7" FontSize="13" />
+            </Grid>
+
+            <!-- Loading overlay -->
+            <Border IsVisible="{Binding IsLoading}" Background="#111318" CornerRadius="8"
+                    Padding="24" Height="200">
+                <StackPanel Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Foreground="#2563EB"
+                                   Width="200" Height="2" />
+                    <TextBlock Text="Loading metrics..." FontSize="13"
+                               Foreground="#A0A4B0" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- KPIs principais -->
+            <Grid ColumnDefinitions="*,12,*,12,*,12,*"
+                  IsVisible="{Binding !IsLoading}">
+
+                <!-- Projects -->
+                <Border Grid.Column="0" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Active Projects" FontSize="12"
+                                   Foreground="#A0A4B0" />
+                        <TextBlock Text="{Binding Metrics.ActiveProjects}"
+                                   FontSize="28" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                        <TextBlock FontSize="11" Foreground="#6366F1">
+                            <Run Text="of " />
+                            <Run Text="{Binding Metrics.TotalProjects}" />
+                            <Run Text=" total" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Completed -->
+                <Border Grid.Column="2" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Completed" FontSize="12"
+                                   Foreground="#A0A4B0" />
+                        <TextBlock Text="{Binding Metrics.CompletedTasks}"
+                                   FontSize="28" FontWeight="SemiBold"
+                                   Foreground="#16A34A" />
+                        <TextBlock Text="tasks" FontSize="11"
+                                   Foreground="#A0A4B0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Pending -->
+                <Border Grid.Column="4" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Pending" FontSize="12"
+                                   Foreground="#A0A4B0" />
+                        <TextBlock Text="{Binding Metrics.PendingTasks}"
+                                   FontSize="28" FontWeight="SemiBold"
+                                   Foreground="#D97706" />
+                        <TextBlock Text="tasks" FontSize="11"
+                                   Foreground="#A0A4B0" />
+                    </StackPanel>
+                </Border>
+
+                <!-- In Progress -->
+                <Border Grid.Column="6" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="In Progress" FontSize="12"
+                                   Foreground="#A0A4B0" />
+                        <TextBlock Text="{Binding Metrics.InProgressTasks}"
+                                   FontSize="28" FontWeight="SemiBold"
+                                   Foreground="#2563EB" />
+                        <TextBlock Text="tasks" FontSize="11"
+                                   Foreground="#A0A4B0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Seco secundaria: Tempo + Difficulty + Priority + IA -->
+            <Grid ColumnDefinitions="*,12,*,12,*,12,*"
+                  IsVisible="{Binding !IsLoading}">
+
+                <!-- Horas estimadas -->
+                <Border Grid.Column="0" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Estimated Time Remaining" FontSize="14"
+                                   FontWeight="SemiBold" Foreground="#F5F6F8" />
+                        <TextBlock Text="{Binding Metrics.EstimatedHoursRemaining, StringFormat='{}{0:F1}h'}"
+                                   FontSize="32" FontWeight="SemiBold"
+                                   Foreground="#0284C7" />
+                        <ProgressBar Value="{Binding Metrics.EstimatedHoursRemaining}"
+                                     Maximum="160" Foreground="#0284C7"
+                                     Background="#2D3142" Height="4"
+                                     CornerRadius="2" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Difficulty -->
+                <Border Grid.Column="2" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Difficulty" FontSize="14"
+                                   FontWeight="SemiBold" Foreground="#F5F6F8" />
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Very Easy"
+                                           FontSize="12" Foreground="#16A34A" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Difficulty.VeryEasy}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Easy"
+                                           FontSize="12" Foreground="#16A34A" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Difficulty.Easy}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Medium"
+                                           FontSize="12" Foreground="#D97706" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Difficulty.Medium}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Hard"
+                                           FontSize="12" Foreground="#DC2626" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Difficulty.Hard}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Very Hard"
+                                           FontSize="12" Foreground="#DC2626" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Difficulty.VeryHard}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Priority -->
+                <Border Grid.Column="4" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Priority" FontSize="14"
+                                   FontWeight="SemiBold" Foreground="#F5F6F8" />
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Low"
+                                           FontSize="12" Foreground="#16A34A" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Priority.Low}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Medium"
+                                           FontSize="12" Foreground="#D97706" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Priority.Medium}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="High"
+                                           FontSize="12" Foreground="#DC2626" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Priority.High}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid ColumnDefinitions="60,*">
+                                <TextBlock Grid.Column="0" Text="Critical"
+                                           FontSize="12" Foreground="#DC2626" />
+                                <TextBlock Grid.Column="1" Text="{Binding Metrics.TaskBreakdown.Priority.Critical}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#F5F6F8" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Métrica de IA -->
+                <Border Grid.Column="6" Background="#181B22" CornerRadius="8"
+                        BorderBrush="#2D3142" BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="AI Co-Written Code" FontSize="14"
+                                   FontWeight="SemiBold" Foreground="#F5F6F8" />
+                        <TextBlock Text="{Binding Metrics.AiUsagePercentage, StringFormat='{}{0:F0}%' }"
+                                   FontSize="32" FontWeight="SemiBold"
+                                   Foreground="#6366F1" />
+                        <ProgressBar Value="{Binding Metrics.AiUsagePercentage}"
+                                     Maximum="100" Foreground="#6366F1"
+                                     Background="#2D3142" Height="4"
+                                     CornerRadius="2" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Breakdown por Type -->
+            <Border Background="#181B22" CornerRadius="8"
+                    BorderBrush="#2D3142" BorderThickness="1" Padding="16"
+                    IsVisible="{Binding !IsLoading}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Tasks by Type" FontSize="14"
+                               FontWeight="SemiBold" Foreground="#F5F6F8" />
+
+                    <Grid ColumnDefinitions="*,12,*,12,*,12,*,12,*">
+                        <!-- Task -->
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <TextBlock Text="Task" FontSize="11"
+                                       Foreground="#A0A4B0" />
+                            <TextBlock Text="{Binding Metrics.TaskBreakdown.Type.Task}"
+                                       FontSize="22" FontWeight="SemiBold"
+                                       Foreground="#F5F6F8" />
+                            <ProgressBar Value="{Binding Metrics.TaskBreakdown.Type.Task}"
+                                         Maximum="{Binding Metrics.TotalProjects, FallbackValue=1}"
+                                         Foreground="#6366F1" Background="#2D3142"
+                                         Height="4" CornerRadius="2" />
+                        </StackPanel>
+
+                        <!-- Feature -->
+                        <StackPanel Grid.Column="2" Spacing="6">
+                            <TextBlock Text="Feature" FontSize="11"
+                                       Foreground="#A0A4B0" />
+                            <TextBlock Text="{Binding Metrics.TaskBreakdown.Type.Feature}"
+                                       FontSize="22" FontWeight="SemiBold"
+                                       Foreground="#6366F1" />
+                            <ProgressBar Value="{Binding Metrics.TaskBreakdown.Type.Feature}"
+                                         Maximum="{Binding Metrics.TotalProjects, FallbackValue=1}"
+                                         Foreground="#6366F1" Background="#2D3142"
+                                         Height="4" CornerRadius="2" />
+                        </StackPanel>
+
+                        <!-- Bug -->
+                        <StackPanel Grid.Column="4" Spacing="6">
+                            <TextBlock Text="Bug" FontSize="11"
+                                       Foreground="#A0A4B0" />
+                            <TextBlock Text="{Binding Metrics.TaskBreakdown.Type.Bug}"
+                                       FontSize="22" FontWeight="SemiBold"
+                                       Foreground="#DC2626" />
+                            <ProgressBar Value="{Binding Metrics.TaskBreakdown.Type.Bug}"
+                                         Maximum="{Binding Metrics.TotalProjects, FallbackValue=1}"
+                                         Foreground="#DC2626" Background="#2D3142"
+                                         Height="4" CornerRadius="2" />
+                        </StackPanel>
+
+                        <!-- Improvement -->
+                        <StackPanel Grid.Column="6" Spacing="6">
+                            <TextBlock Text="Improvement" FontSize="11"
+                                       Foreground="#A0A4B0" />
+                            <TextBlock Text="{Binding Metrics.TaskBreakdown.Type.Improvement}"
+                                       FontSize="22" FontWeight="SemiBold"
+                                       Foreground="#16A34A" />
+                            <ProgressBar Value="{Binding Metrics.TaskBreakdown.Type.Improvement}"
+                                         Maximum="{Binding Metrics.TotalProjects, FallbackValue=1}"
+                                         Foreground="#16A34A" Background="#2D3142"
+                                         Height="4" CornerRadius="2" />
+                        </StackPanel>
+
+                        <!-- Documentation -->
+                        <StackPanel Grid.Column="8" Spacing="6">
+                            <TextBlock Text="Docs" FontSize="11"
+                                       Foreground="#A0A4B0" />
+                            <TextBlock Text="{Binding Metrics.TaskBreakdown.Type.Documentation}"
+                                       FontSize="22" FontWeight="SemiBold"
+                                       Foreground="#0284C7" />
+                            <ProgressBar Value="{Binding Metrics.TaskBreakdown.Type.Documentation}"
+                                         Maximum="{Binding Metrics.TotalProjects, FallbackValue=1}"
+                                         Foreground="#0284C7" Background="#2D3142"
+                                         Height="4" CornerRadius="2" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

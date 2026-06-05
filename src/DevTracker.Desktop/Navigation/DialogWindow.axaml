@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DevTracker.Desktop.Navigation.DialogWindow"
+        x:CompileBindings="False"
+        Title="DevTracker"
+        MinWidth="420"
+        MinHeight="180"
+        SizeToContent="WidthAndHeight"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="#181B22">
+
+    <!-- ContentControl activa o ViewLocator global para mapear ViewModel → View -->
+    <ContentControl Content="{Binding}" />
+</Window>

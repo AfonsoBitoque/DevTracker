@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="using:DevTracker.Desktop.ViewModels.Shell"
+        x:Class="DevTracker.Desktop.MainWindow"
+        x:DataType="shell:ShellViewModel"
+        Title="DevTracker"
+        MinWidth="1024" MinHeight="640"
+        Background="#111318">
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="240,*">
+
+        <!-- Sidebar (ocupa ambas as rows) -->
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="0,0,1,0"
+                IsVisible="{Binding IsAuthenticated}">
+
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="0,16,0,0" Spacing="2">
+                    <TextBlock Text="DevTracker"
+                               Foreground="#F5F6F8"
+                               FontSize="18" FontWeight="SemiBold"
+                               Margin="20,0,0,24" />
+
+                    <Button Classes="nav-item" Content="Dashboard"
+                            Command="{Binding GoToDashboardCommand}"
+                            HorizontalAlignment="Stretch" />
+
+                    <Button Classes="nav-item" Content="Projects"
+                            Command="{Binding GoToProjectsCommand}"
+                            HorizontalAlignment="Stretch" />
+
+                    <Button Classes="nav-item" Content="Usernamees"
+                            Command="{Binding GoToUsersCommand}"
+                            IsVisible="{Binding CanManageUsers}"
+                            HorizontalAlignment="Stretch" />
+
+                    <Button Classes="nav-item" Content="Audit"
+                            Command="{Binding GoToAuditCommand}"
+                            IsVisible="{Binding CanViewAudit}"
+                            HorizontalAlignment="Stretch" />
+
+                    <Button Classes="nav-item" Content="Settings"
+                            Command="{Binding GoToSettingsCommand}"
+                            HorizontalAlignment="Stretch" />
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,12" Spacing="2">
+                    <Separator Background="#2D3142" Height="1" Margin="16,8" />
+                    <Button Classes="nav-item" Content="Log out"
+                            Command="{Binding LogoutCommand}"
+                            HorizontalAlignment="Stretch"
+                            Foreground="#DC2626" />
+                </StackPanel>
+
+                <Grid />
+            </DockPanel>
+        </Border>
+
+        <!-- Header Toolbar -->
+        <Border Grid.Row="0" Grid.Column="1"
+                Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="0,0,0,1"
+                Padding="16,8"
+                IsVisible="{Binding IsAuthenticated}">
+            <StackPanel Orientation="Horizontal" Spacing="8" />
+
+        </Border>
+
+        <!-- Conteúdo principal -->
+        <ContentControl Grid.Row="1" Grid.Column="1"
+                        Content="{Binding CurrentPage}"
+                        Background="#111318" />
+    </Grid>
+
+    <Window.Styles>
+        <Style Selector="Button.nav-item">
+            <Setter Property="Background"    Value="Transparent" />
+            <Setter Property="Foreground"    Value="#A0A4B0" />
+            <Setter Property="FontSize"      Value="14" />
+            <Setter Property="Padding"       Value="20,10" />
+            <Setter Property="CornerRadius"  Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor"        Value="Hand" />
+        </Style>
+        <Style Selector="Button.nav-item:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1E222D" />
+            <Setter Property="TextElement.Foreground" Value="#F5F6F8" />
+        </Style>
+    </Window.Styles>
+</Window>

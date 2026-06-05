@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels"
+             x:Class="DevTracker.Desktop.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <Grid RowDefinitions="Auto,*" Margin="24">
+        <!-- Cabeçalho -->
+        <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,24">
+            <TextBlock Text="Settings" FontSize="18" FontWeight="SemiBold" Foreground="#F5F6F8" />
+            <TextBlock Text="System settings" FontSize="13" Foreground="#A0A4B0" />
+        </StackPanel>
+
+        <!-- Conteúdo -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="24" MaxWidth="600">
+                <!-- GitHub Credentials -->
+                <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="GitHub" FontSize="14" FontWeight="Medium" Foreground="#F5F6F8" />
+                        
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Username" FontSize="13" Foreground="#A0A4B0" />
+                            <TextBox Text="{Binding GitHubUsername}" PlaceholderText="username"
+                                     Background="#111318" Foreground="#F5F6F8"
+                                     BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Personal Access Token" FontSize="13" Foreground="#A0A4B0" />
+                            <TextBox Text="{Binding GitHubToken}" PlaceholderText="ghp_xxxxxxxxxxxx"
+                                     Background="#111318" Foreground="#F5F6F8"
+                                     BorderBrush="#2D3142" CornerRadius="6" Padding="10,8"
+                                     PasswordChar="*" />
+                        </StackPanel>
+
+                        <TextBlock Text="The token is used to push commits to GitHub."
+                                   FontSize="11" Foreground="#6B7280" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Botão Save -->
+                <Button Content="Save Settings"
+                        Command="{Binding SaveCommand}"
+                        HorizontalAlignment="Left"
+                        Background="#2563EB" Foreground="#FFFFFF"
+                        CornerRadius="6" Padding="16,8" FontSize="13" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,178 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.WorkItems"
+             xmlns:dto="using:DevTracker.Application.DTOs.WorkItems"
+             x:Class="DevTracker.Desktop.Views.WorkItems.WorkItemDetailView"
+             x:DataType="vm:WorkItemDetailViewModel"
+             Background="#111318">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Cabeçalho -->
+        <Border Grid.Row="0" Background="#181B22"
+                BorderBrush="#2D3142" BorderThickness="0,0,0,1"
+                Padding="24,16">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0" Content="← Back"
+                        Command="{Binding GoBackCommand}"
+                        Background="Transparent" Foreground="#6B7280"
+                        BorderThickness="0" Padding="0,0,16,0" FontSize="13" />
+
+                <StackPanel Grid.Column="1" Spacing="3">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock FontSize="13" Foreground="#6B7280">
+                            <Run Text="#" /><Run Text="{Binding WorkItem.Number, FallbackValue='—'}" />
+                        </TextBlock>
+                        <TextBlock Text="{Binding WorkItem.Title, FallbackValue='—'}"
+                                   FontSize="18" FontWeight="SemiBold" Foreground="#F5F6F8" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <TextBlock Text="{Binding WorkItem.Type,     FallbackValue=''}" FontSize="12" Foreground="#6B7280" />
+                        <TextBlock Text="{Binding WorkItem.Priority, FallbackValue=''}" FontSize="12" Foreground="#D97706" />
+                        <TextBlock Text="{Binding WorkItem.Status,   FallbackValue=''}" FontSize="12" Foreground="#6366F1" />
+                    </StackPanel>
+
+                    <!-- Etiquetas -->
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <ItemsControl ItemsSource="{Binding WorkItem.Labels}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1E222D" BorderBrush="#2D3142" BorderThickness="1"
+                                            CornerRadius="4" Padding="6,2">
+                                        <TextBlock Text="{Binding}" FontSize="11" Foreground="#A0A4B0" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Content="Manage Labels"
+                                Command="{Binding ManageLabelsCommand}"
+                                Background="Transparent" Foreground="#2563EB"
+                                BorderThickness="0" Padding="0" FontSize="11" />
+                    </StackPanel>
+
+                    <!-- AI Momentum Panel -->
+                    <Border Background="#1E293B" BorderBrush="#3B82F6" BorderThickness="1"
+                            CornerRadius="8" Padding="12" Margin="0,8,0,0"
+                            IsVisible="{Binding WorkItem.MomentumNote, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="AI Momentum – Where you left off:"
+                                       FontSize="12" FontWeight="SemiBold" Foreground="#60A5FA" />
+                            <TextBlock Text="{Binding WorkItem.MomentumNote}"
+                                       FontSize="13" Foreground="#E2E8F0"
+                                       FontStyle="Italic" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <Button Content="Edit"
+                            Command="{Binding UpdateCommand}"
+                            IsVisible="{Binding CanUpdate}"
+                            Background="#1E222D" Foreground="#A0A4B0"
+                            BorderBrush="#2D3142" BorderThickness="1"
+                            CornerRadius="6" Padding="12,7" FontSize="13" />
+
+                    <Button Content="Delete"
+                            Command="{Binding DeleteCommand}"
+                            IsVisible="{Binding CanDelete}"
+                            Background="Transparent" Foreground="#DC2626"
+                            BorderBrush="#DC2626" BorderThickness="1"
+                            CornerRadius="6" Padding="12,7" FontSize="13" />
+
+                    <Button Content="Copy AI Context"
+                            Command="{Binding CopyAiContextCommand}"
+                            Background="#2D3142" Foreground="#A0A4B0"
+                            BorderBrush="#3E4252" BorderThickness="1"
+                            CornerRadius="6" Padding="12,7" FontSize="13"
+                            Cursor="Hand" />
+
+                    <Button Content="Open PR"
+                            Command="{Binding CreatePullRequestCommand}"
+                            IsVisible="{Binding CanCreatePullRequest}"
+                            Background="#2D3142" Foreground="#A0A4B0"
+                            BorderBrush="#3E4252" BorderThickness="1"
+                            CornerRadius="6" Padding="12,7" FontSize="13" />
+
+                    <Button Content="Start Task"
+                            Command="{Binding StartTaskCommand}"
+                            IsVisible="{Binding CanStartTask}"
+                            Background="#16A34A" Foreground="#FFFFFF"
+                            CornerRadius="6" Padding="12,7" FontSize="13" />
+
+                    <Button Content="Pause Task"
+                            Command="{Binding PauseTaskCommand}"
+                            IsVisible="{Binding CanPauseTask}"
+                            Background="#D97706" Foreground="#FFFFFF"
+                            CornerRadius="6" Padding="12,7" FontSize="13" />
+
+                    <Button Content="Finish Task"
+                            Command="{Binding FinishTaskCommand}"
+                            IsVisible="{Binding CanFinishTask}"
+                            Background="#2563EB" Foreground="#FFFFFF"
+                            CornerRadius="6" Padding="12,7" FontSize="13" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Corpo -->
+        <ScrollViewer Grid.Row="1" Padding="24">
+            <StackPanel Spacing="24">
+
+                <!-- Descrição -->
+                <StackPanel Spacing="8" IsVisible="{Binding WorkItem.Description, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="Description" FontSize="13" FontWeight="Medium" Foreground="#A0A4B0" />
+                    <TextBlock Text="{Binding WorkItem.Description}" FontSize="14" Foreground="#D1D5DB" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Comments -->
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Comments" FontSize="14" FontWeight="Medium" Foreground="#F5F6F8" />
+
+                    <ItemsControl ItemsSource="{Binding WorkItem.Comments}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="dto:CommentDto">
+                                <Border Background="#181B22" BorderBrush="#2D3142" BorderThickness="1"
+                                        CornerRadius="6" Padding="14,10" Margin="0,0,0,6">
+                                    <StackPanel Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <TextBlock Text="{Binding AuthorUsername}" FontSize="13" FontWeight="Medium" Foreground="#F5F6F8" />
+                                            <TextBlock Text="{Binding CreatedAt}" FontSize="11" Foreground="#6B7280" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Body}" FontSize="13" Foreground="#D1D5DB" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Add comentário -->
+                    <StackPanel Spacing="8" IsVisible="{Binding CanComment}">
+                        <TextBox Text="{Binding NewComment}"
+                                 PlaceholderText="Add comment..."
+                                 Background="#181B22" Foreground="#F5F6F8"
+                                 BorderBrush="#2D3142" CornerRadius="6"
+                                 Padding="12,10" AcceptsReturn="True" MinHeight="80" />
+                        <Button Content="Comment"
+                                Command="{Binding AddCommentCommand}"
+                                Background="#2563EB" Foreground="#FFFFFF"
+                                CornerRadius="6" Padding="14,8" FontSize="13"
+                                HorizontalAlignment="Right" />
+                    </StackPanel>
+                </StackPanel>
+
+                <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                             Foreground="#2563EB" Height="2" />
+                <TextBlock Text="{Binding BusyMessage}"
+                           IsVisible="{Binding IsBusy}"
+                           FontSize="12" Foreground="#AEB3C2"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

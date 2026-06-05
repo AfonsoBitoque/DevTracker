@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DevTracker.Desktop.ViewModels.Projects"
+             x:Class="DevTracker.Desktop.Views.Projects.CreateProjectDialogView"
+             x:DataType="vm:CreateProjectDialogViewModel">
+
+    <StackPanel Margin="24" Spacing="20">
+        <TextBlock Text="New Project" FontSize="18" FontWeight="SemiBold" Foreground="#F5F6F8" />
+
+        <Border Background="#3B1515" CornerRadius="6" Padding="12,8"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#DC2626" FontSize="13" TextWrapping="Wrap" />
+        </Border>
+
+        <!-- Name -->
+        <StackPanel Spacing="6">
+            <TextBlock Text="Name" FontSize="13" Foreground="#A0A4B0" />
+            <TextBox Text="{Binding Name}" PlaceholderText="Name do projeto"
+                     Background="#111318" Foreground="#F5F6F8"
+                     BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+        </StackPanel>
+
+        <!-- Descrição -->
+        <StackPanel Spacing="6">
+            <TextBlock Text="Description (optional)" FontSize="13" Foreground="#A0A4B0" />
+            <TextBox Text="{Binding Description}" PlaceholderText="Brief description..."
+                     Background="#111318" Foreground="#F5F6F8"
+                     BorderBrush="#2D3142" CornerRadius="6" Padding="10,8" />
+        </StackPanel>
+
+        <!-- Cor -->
+        <StackPanel Spacing="6">
+            <TextBlock Text="Color (#RRGGBB)" FontSize="13" Foreground="#A0A4B0" />
+            <TextBox Text="{Binding Color}" PlaceholderText="#2563EB"
+                     Background="#111318" Foreground="#F5F6F8"
+                     BorderBrush="#2D3142" CornerRadius="6" Padding="10,8"
+                     FontFamily="JetBrains Mono,Fira Code,monospace" />
+        </StackPanel>
+
+        <!-- GitHub Repository URL -->
+        <StackPanel Spacing="6">
+            <TextBlock Text="GitHub Repository URL (optional)" FontSize="13" Foreground="#A0A4B0" />
+            <TextBox Text="{Binding GitHubRepositoryUrl}" PlaceholderText="https://github.com/username/repo"
+                     Background="#111318" Foreground="#F5F6F8"
+                     BorderBrush="#2D3142" CornerRadius="6" Padding="10,8"
+                     FontFamily="JetBrains Mono,Fira Code,monospace" />
+        </StackPanel>
+
+        <!-- Nota informativa sobre a pasta -->        
+        <Border Background="#111827" BorderBrush="#2D3142" BorderThickness="1" CornerRadius="6" Padding="12,8">
+            <TextBlock FontSize="12" Foreground="#6B7280" TextWrapping="Wrap">
+                <Run Text="The project folder will be created automatically in the workspace using the project name." />
+            </TextBlock>
+        </Border>
+
+        <!-- Actions -->
+        <Grid ColumnDefinitions="*,12,*">
+            <Button Grid.Column="0" Content="Cancel"
+                    Command="{Binding CancelDialogCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#1E222D" Foreground="#A0A4B0"
+                    BorderBrush="#2D3142" BorderThickness="1"
+                    CornerRadius="6" Padding="0,9" />
+
+            <Button Grid.Column="2" Content="Create"
+                    Command="{Binding ConfirmCommand}"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Background="#2563EB" Foreground="#FFFFFF"
+                    CornerRadius="6" Padding="0,9" IsEnabled="{Binding !IsBusy}" />
+        </Grid>
+
+        <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True"
+                     Foreground="#2563EB" Height="2" />
+        <TextBlock Text="{Binding BusyMessage}"
+                   IsVisible="{Binding IsBusy}"
+                   FontSize="12" Foreground="#AEB3C2"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,0" />
+    </StackPanel>
+</UserControl>
