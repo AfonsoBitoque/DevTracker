@@ -60,3 +60,32 @@ TestResults/
 
 # Config with secrets (if generated)
 config.json
+
+# ASP.NET / .NET AppSettings with secrets
+appsettings.json
+appsettings.Development.json
+appsettings.Local.json
+local.settings.json
+
+# Environment variables & secrets
+.env
+*.env
+.env.local
+.env.*.local
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Keys & certificates
+*.pfx
+*.p12
+*.pem
+*.key
+certs/
+keys/
